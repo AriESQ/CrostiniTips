@@ -20,12 +20,29 @@ https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/HEAD/proj
 https://medium.com/@tcij1013/lxc-lxd-cheetsheet-effb5389922d
 
 https://wiki.archlinux.org/title/Chrome_OS_devices/Crostini
+https://wiki.debian.org/LXC
 
 https://blog.merzlabs.com/posts/crostini-now-usable/
 https://blog.merzlabs.com/posts/yubikey-crostini/
 
-https://github.com/lxc
 
 https://stgraber.org/2016/03/11/lxd-2-0-blog-post-series-012/
 
 https://linuxcontainers.org/lxd/docs/master/authentication/
+
+## Source code for reference
+https://chromium.googlesource.com/chromiumos/platform2/
+https://chromium.googlesource.com/chromiumos/platform/crosvm/
+https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/crosh
+https://github.com/google/crosvm
+https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/
+https://chromium.googlesource.com/chromiumos/platform/tremplin/
+https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/main/project-termina/
+
+https://github.com/lxc
+
+## Remotes for LXC container images
+https://us.lxd.images.canonical.com/
+https://us.lxd.images.canonical.com/meta/1.0/
+https://us.lxd.images.canonical.com/meta/1.0/index-system.1
+https://us.lxd.images.canonical.com/meta/1.0/index-user.1
