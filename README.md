@@ -1,6 +1,9 @@
 # CrostiniTips
 Tips for running linux containers (LXC) on ChromeOS via Crostini
 
+## Crostini Architecture Overview
+
+
 https://chromium.googlesource.com/chromiumos/docs/+/HEAD/crostini_developer_guide.md
 https://chromium.googlesource.com/chromiumos/docs/+/HEAD/containers_and_vms.md
 https://chromium.googlesource.com/chromium/src/+/main/chrome/browser/ash/crostini
