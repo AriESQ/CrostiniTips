@@ -5,9 +5,6 @@ Crostini is a system for running LXC containers on the ChromeOS operating system
 
 Crostini's architecture is complex. There are several layers of virtualization technologies that are nested within each other. As well as communication and control channels that traverse layers. This document will help you understand this architecture so that you can run and troubleshoot LXC containers on ChromeOS. 
 
-## Chrome vs Chromium and Open Source Software
-
-
 ## Crostini Architecture Overview
 ![Crostini Services Diagram](./images/crostini_services.png "crostini_services.png")
 
@@ -49,90 +46,13 @@ In Chrome type `chrome://flags#crostini-multi-container` and enable the feature.
 
 Restart your Chromebook.
 
-Depending on your version of ChromeOS you may now have access to  
-
-
-## Networking
-Under settings you can do port forwarding.
-
-## Files Access
-
-## USB
+Depending on your version of ChromeOS you may now have access to the multi-container UI.
 
 ## Troubleshooting
 * If Linux Developer Options do not appear or the multiple container UI doesn't appear, try restarting the system. Or try disabling and re-enabling the crostini-multi-container flag, or linux development environment.
 
 * If you are working off of tutorials, check that they are somewhat recent, ChromeOS/Crostini are developing rapidly.
-___
-Working below this line.
 
-Quote: The crosh shell runs in the same environment as the browser (same user/group, same Linux namespaces, etc...). So any tools you run in crosh, or information you try to acquire, must be accessible to the chronos user.
-
-Spent way to much time trying to determine what context crosh and crosvm work in. Crosvm implicitly needs to run in OS userpace because it uses low level kernel functions, wouldn't make sense to run under Chrome process.
-
-Crost (?) Documentation says it runs "same env as browser" does that mean it's a sub-shell? Unclear. But doesn't matter for purposes of this doc. Could identify this easily on a rooted device.
-
-https://chromium.googlesource.com/chromiumos/docs/+/HEAD/costini_developer_guide.md
-https://chromium.googlesource.com/chromiumos/docs/+/HEAD/containers_and_vms.md
-https://chromium.googlesource.com/chromium/src/+/main/chrome/browser/ash/crostini
-https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/vsh/
-
-https://chromium.googlesource.com/chromiumos/docs/+/HEAD/dbus_in_chrome.md
-https://www.chromium.org/developers/mus-ash/ - discontinued 2019
-
-https://www.chromium.org/chromium-os/chromiumos-design-docs/boot-design/
-
-https://chromium.googlesource.com/chromiumos/platform2/
-
-https://chromium.googlesource.com/chromiumos/docs/+/HEAD/security/chromeos_security_whitepaper.md - Graphic clarifying OS Userspace is here.
-
-https://www.chromium.org/chromium-os/
-
-https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/init/vm_concierge.conf - nsenter details
-
-https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh#35 -Confirms that Tremplin writes /etc/apt/sources.d/cros.list (Possible also writes sytemd unit files then?)
-
-Original place where cros-containers repo was found.
-https://www.reddit.com/r/Crostini/wiki/howto/install-behind-a-proxy
-https://storage.googleapis.com/cros-containers
-
-https://www.aboutchromebooks.com/news/chrome-os-98-adds-management-of-multiple-chromebook-linux-containers/
-
-
-
-https://www.reddit.com/r/Crostini/comments/s31fwc/multiple_crostini_containers_can_now_run/
-
-https://blog.simos.info/a-closer-look-at-chrome-os-using-lxd-to-run-linux-gui-apps-project-crostini/#The%20Chrome%20OS%20deb%20package%20repository
-
-https://github.com/edeloya/ChromeOS-Terminal-LXC-LXD
-https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/HEAD/project-termina/
-https://medium.com/@tcij1013/lxc-lxd-cheetsheet-effb5389922d
-
-https://wiki.archlinux.org/title/Chrome_OS_devices/Crostini
-https://wiki.debian.org/LXC
-
-https://blog.merzlabs.com/posts/crostini-now-usable/
-https://blog.merzlabs.com/posts/yubikey-crostini/
-
-
-https://stgraber.org/2016/03/11/lxd-2-0-blog-post-series-012/
-
-https://linuxcontainers.org/lxd/docs/master/authentication/
-
-## Source code for reference
-https://chromium.googlesource.com/chromiumos/platform2/
-https://chromium.googlesource.com/chromiumos/platform/crosvm/
-https://github.com/google/crosvm
-
-https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/crosh
-
-https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/
-
-
-https://chromium.googlesource.com/chromiumos/platform/tremplin/
-https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/main/project-termina/
-
-https://github.com/lxc
 
 ## Remotes for LXC container images
 https://us.lxd.images.canonical.com/
