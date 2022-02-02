@@ -5,8 +5,8 @@ Crostini is a system for running LXC containers on the ChromeOS operating system
 
 Crostini's architecture is complex. There are several layers of virtualization technologies that are nested within each other. As well as communication and control channels that traverse layers. This document will help you understand this architecture so that you can run and troubleshoot LXC containers on ChromeOS. 
 
-## Chrome vs Chromium and Open Source Software
-
+## ChromeOS vs ChromiumOS and Open Source Software
+ChromiumOS is an Open Source Project, [founded by Google](https://blog.chromium.org/2009/12/whats-difference-between-chromium-os.html). Contributors, including Google employees in their professional capacities contribute to ChromiumOS. Google then pulls from the ChromiumOS source tree to build their commercial ChromeOS products. Just be aware that if you are looking at the ChromiumOS sources to understand your ChromeOS device there may be subtle differences.
 
 ## Crostini Architecture Overview
 ![Crostini Services Diagram](./images/crostini_services.png "crostini_services.png")
@@ -34,22 +34,90 @@ ChromeOS
 ## cros-container-guest-tools
 The [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) enable communication between a LXC container and the ChromeOS operating system, traversing the CrosVM virtual machine boundary. These tools are installed by attaching a virtual disk inside the LXC container and mounting it at `/opt/google/cros-containers`. [lxc_setup.sh](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh) is run when the container is first created, which installs the `cros-guest-tools`. The guest tools are started in the lxc container via systemd unite files in `/etc/systemd/users/`.    
 
-
-
 ### Installing cros-container-guest-tools on alternative containers
-Add appropriate apt repo key
+Add appropriate apt repo key - https://www.google.com/linuxrepositories/
 Add repo
 apt install cros-guest-tools
 https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh
+
+
+For Redhat:
+https://centos.pkgs.org/8/epel-x86_64/cros-guest-tools-1.0-0.39.20200806git19eab9e.el8.noarch.rpm.html
+
+Arch Linux (reported broken):
+https://aur.archlinux.org/packages/cros-container-guest-tools-git/
 
 ## Getting started running custom LXC containers.
 In ChromeOS settings, go to Advanced > Developers> Linux development environment and enable "Linux development environment."
 
 In Chrome type `chrome://flags#crostini-multi-container` and enable the feature.
 
-Restart your Chromebook.
+Restart your ChromeOS device.
 
-Depending on your version of ChromeOS you may now have access to  
+Depending on your version of ChromeOS you may now have access to the "Manage Extra Containers" option under Advanced > Linux Development Environment.
+
+![Manage Extra Containers](./images/ManageExtraContainers.png "ManageExtraContainers.png")
+
+At this point you have a pretty powerful setup. You can start/stop create/delete default LXC containers from this UI. From the desktop you can right-click (Alt-click) on the Terminal application, to choose which LXC container to connect to.
+
+## Installing Ubuntu
+Ubuntu is based on Debian, just like the default Penguin container. As such, the `cros-guest-tools` .deb installer mostly works. Sommelier doesn't install, so Wayland/GUI apps don't work, but you can get the integration with the default Terminal app working for a usable command-line experience.
+
+You can use Advanced > Developers > Linux Development Enviornment > Manage extra containers > Create dialog to get started.
+
+![Ubuntu Install](./images/UbuntuInstall.png "UbuntuInstall.png")
+
+Verify that the container started, by opening Termina and executing `lxc list`, where you should see your container running. Execute `lxc exec <container name> -- /bin/bash`, which should give you a root prompt inside your container.
+
+In that container:
+```
+apt update
+apt upgrade -y
+apt install -y wget gpg
+wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
+echo "deb https://storage.googleapis.com/cros-packages/98 bullseye main" > /etc/apt/sources.list.d/cros.list"
+apt update
+apt install -y cros-guest-tools
+```
+At some point this install will fail. Possibly on the `cros-ui-config` package. This appears related to the Chromium OS Sommelier package which provides the Wayland service for graphical dekstop apps.
+
+Shutdown the container with `shutdown -P now`
+
+In the `termina` virtual machine, you can verify the container is stopped with `lxc list`. Exit out of `termina` and in the `crosh` shell execute `vmc container termina <container name>`
+
+On my system this immediately dropped me into a shell as user `ubuntu` on the lxc container. SystemD had started the garcon daemon, and right-clicking (alt-clicking) on the Terminal app allowed me to open a shell into the container. The container was also able to be stopped and deleted via the Manage Extra Containers dialog. The container was available across reboots, and just needed to be re-started via the Terminal app. 
+
+Further research can be done into de-coupling the gui and sound bits from the `cros-guest-tools` .deb meta-package, and only installing those guest extensions needed for a minimal Ubuntu install.
+
+Possible workarounds to GUI issue: 
+https://github.com/quack1-1/scripts
+https://github.com/pitastrudl/wekanwiki/blob/master/Chromebook.md#5-install-crostini-packages
+https://github.com/LukeShortCloud/rootpages/blob/main/src/linux_distributions/chromium_os.rst
+
+## Installing Red Hat Linux distributions.
+
+
+
+
+## Advanced LXC container operations
+
+lxc list (defaults to containers)
+
+lxc config show <container name>
+
+lxc profile, lxc profile show <default>
+
+lxc remote list
+
+If you launch an image that you don't have locally, it will first download it. To avoid this you can cp it locally first. be sure to --copy-aliases
+
+Adding a new remote:
+
+
+lxc info --resources (information about running server)
+for more info, append --debug
+
+And number of profiles can be applied to a container. So you could have one that handles networking, another that handles mounts, etc.
 
 
 ## Networking
@@ -59,18 +127,26 @@ Under settings you can do port forwarding.
 
 ## USB
 
+## ChromeOS internals
+For advanced troubleshooting, low-level development, or curiosity; one might wish to understand how ChromeOS works behind the scense. Especially considering that there appears to be some "magic" configuration of LXC containers.
+
+It is possible to put a ChromeOS device into Developer Mode, by holding down ESC+Refresh while powering up the device. You will be prompted with warnings that continuing will wipe user data off the device. Once you complete the ChromeOS device setup, you can enter CRoSH shell (Ctrl+Alt+T) and then type `shell` to log into a non-virtualized, "bare-metal" shell on the device. You should see a prompt of `chronos@localhost`. The `chronos` user has sudo privileges.
+
+ChromeOS uses [Upstart](https://www.chromium.org/chromium-os/chromiumos-design-docs/boot-design/) as it's initialization (init) system. System configuration is stored in `/etc/init/`, and `/sbin/initctl` can be used to quest the state of services. By default neither `/sbin` or `/usr/sbin` are in `$PATH`, although you will find useful executables there.
+
+The command `ps aux --forest` is useful in seeing how the running system is organized. You can see user, process, and child-process information.
+
+The control virtual machine, named termina is loaded from `/run/imageloader/termina-dlc/package/root/`
+
 ## Troubleshooting
 * If Linux Developer Options do not appear or the multiple container UI doesn't appear, try restarting the system. Or try disabling and re-enabling the crostini-multi-container flag, or linux development environment.
 
 * If you are working off of tutorials, check that they are somewhat recent, ChromeOS/Crostini are developing rapidly.
+
+
 ___
 Working below this line.
 
-Quote: The crosh shell runs in the same environment as the browser (same user/group, same Linux namespaces, etc...). So any tools you run in crosh, or information you try to acquire, must be accessible to the chronos user.
-
-Spent way to much time trying to determine what context crosh and crosvm work in. Crosvm implicitly needs to run in OS userpace because it uses low level kernel functions, wouldn't make sense to run under Chrome process.
-
-Crost (?) Documentation says it runs "same env as browser" does that mean it's a sub-shell? Unclear. But doesn't matter for purposes of this doc. Could identify this easily on a rooted device.
 
 https://chromium.googlesource.com/chromiumos/docs/+/HEAD/costini_developer_guide.md
 https://chromium.googlesource.com/chromiumos/docs/+/HEAD/containers_and_vms.md
@@ -86,7 +162,11 @@ https://chromium.googlesource.com/chromiumos/platform2/
 
 https://chromium.googlesource.com/chromiumos/docs/+/HEAD/security/chromeos_security_whitepaper.md - Graphic clarifying OS Userspace is here.
 
+https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/crosh/src/base/vmc.rs
+
 https://www.chromium.org/chromium-os/
+
+https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/docs/init.md
 
 https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/init/vm_concierge.conf - nsenter details
 
@@ -135,6 +215,7 @@ https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/main/proj
 https://github.com/lxc
 
 ## Remotes for LXC container images
+
 https://us.lxd.images.canonical.com/
 https://us.lxd.images.canonical.com/meta/1.0/
 https://us.lxd.images.canonical.com/meta/1.0/index-system.1

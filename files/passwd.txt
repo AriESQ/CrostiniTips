@@ -1,0 +1,125 @@
+chronos@localhost /etc/runlevels/sysinit $ cat /etc/passwd 
+messagebus:!:201:201:dbus-daemon:/dev/null:/bin/false
+traced:!:20160:20160:Perfetto system tracing service:/dev/null:/bin/false
+traced-probes:!:20161:20161:Perfetto system tracing probes using debugfs, procfs and sysfs.:/dev/null:/bin/false
+sound_card_init:!:20147:20147:Chromium OS sound card initializer:/dev/null:/bin/false
+wayland:!:601:601:Wayland display access:/dev/null:/bin/false
+arc-bridge:!:602:602:ARC bridge access:/dev/null:/bin/false
+android-root:!:655360:655360:CrOS android container user:/dev/null:/bin/false
+resourced:!:20175:20175:resourced provides a D-Bus interface for getting resource usage stats:/dev/null:/bin/false
+chunneld:!:20141:20141:Daemon for tunneling localhost to containers:/dev/null:/bin/false
+sslh:!:200:200:network port multiplexer:/dev/null:/bin/false
+pluginvm:!:20128:20128:Plugin VM monitor:/dev/null:/bin/false
+root:x:0:0:root:/root:/bin/bash
+bin:!:1:1:bin:/bin:/bin/false
+daemon:!:2:2:daemon:/sbin:/bin/false
+adm:!:3:4:adm:/var/adm:/bin/false
+lp:!:4:7:lp:/var/spool/lpd:/bin/false
+news:!:9:13:news:/var/spool/news:/bin/false
+uucp:!:10:14:uucp:/var/spool/uucp:/bin/false
+fwupdate-i2c:!:20135:20135:user for firmware update utilities that use i2c-dev:/dev/null:/bin/false
+portage:!:250:250:portage:/var/tmp/portage:/bin/false
+nobody:!:65534:65534:nobody:/dev/null:/bin/false
+input:!:222:222:dev/input/event access:/dev/null:/bin/false
+chronos:x:1000:1000:system_user:/home/chronos/user:/bin/bash
+chronos-access:!:1001:1001:non-chronos user with access to chronos data:/dev/null:/bin/false
+avahi:!:238:238:avahi-daemon:/dev/null:/bin/false
+dhcp:!:224:224:dhcpcd DHCP client:/dev/null:/bin/false
+smdisplay:!:20148:20148:SMIUSBDisplay daemon user:/dev/null:/bin/false
+saned:!:255:255:document scanning process:/dev/null:/bin/false
+lpadmin:!:269:269:CUPS admin service user for running lpadmin:/dev/null:/bin/false
+cups:!:277:277:CUPS daemon:/dev/null:/bin/false
+ippusb:!:20100:20100: user for printing using ipp over usb:/dev/null:/bin/false
+shill:!:20104:20104:user for the connection manager:/dev/null:/bin/false
+usbguard:!:20123:20123:USB device allowlisting daemon:/dev/null:/bin/false
+tlsdate:!:234:234:tlsdate, secure network time daemon:/dev/null:/bin/false
+fwupdate-hidraw:!:20139:20139:user for firmware update utilities that use hidraw devices:/dev/null:/bin/false
+tlsdate-dbus:!:233:233:tlsdate-dbus-announce:/dev/null:/bin/false
+g2touch:!:20127:20127:user for g2touch tools to update touch devices:/dev/null:/bin/false
+goodixfwupdate:!:20111:20111:user for tools to update goodix touch devices:/dev/null:/bin/false
+sshd:!:204:204:ssh daemon:/dev/null:/bin/false
+rma_fw_keeper:!:20125:20125:RMA'ed device FW keeper. verify_ro in crosh runs as this user.:/dev/null:/bin/false
+wpa:!:219:219:wpa_supplicant:/dev/null:/bin/false
+modem:!:241:241:modem manager:/dev/null:/bin/false
+fwupd:!:20130:20130:Firmware Update Tool. /usr/libexec/fwupd/fwupdtool runs as this user.:/dev/null:/bin/false
+dlp:!:20173:20173:CrOS System-wide DLP daemon:/dev/null:/bin/false
+spaced:!:20181:20181:spaced provides disk usage information and will inform disk clean-up operations for other daemons:/dev/null:/bin/false
+cups-proxy:!:20136:20136:CrOS CUPS proxy daemon:/dev/null:/bin/false
+dlm:!:262:262:DisplayLinkManager daemon user:/dev/null:/bin/false
+metrics:!:20140:20140:user for metrics_daemon to run its services in sandboxed environment:/dev/null:/bin/false
+fuse-smbfs:!:307:307:FUSE-based SMB client:/dev/null:/bin/false
+image-burner:!:310:310:CrOS Image Burner daemon:/dev/null:/bin/false
+hardware_verifier:!:417:417:standalone user for running hardware_verifier binary minijailed:/dev/null:/bin/false
+imageloaderd:!:220:220:imageloader dbus service:/dev/null:/bin/false
+missived:!:20172:20172:Administrative Events Handler Daemon:/dev/null:/bin/false
+arc-host-clock:!:20152:20152:ARC host clock service:/dev/null:/bin/false
+crosdns:!:20110:20110:crosdns daemon:/dev/null:/bin/false
+arcvm-boot-notification-server:!:20150:20150:boot notification server daemon:/dev/null:/bin/false
+runtime_probe:!:20117:20117:CrOS Runtime Probe:/dev/null:/bin/false
+virtual-file-provider:!:294:294:Virtual file provider service:/dev/null:/bin/false
+midis:!:608:608:CrOS MIDI daemon:/dev/null:/bin/false
+smbproviderd:!:297:297:smbprovider daemon:/dev/null:/bin/false
+mtp:!:226:226:libmtp:/dev/null:/bin/false
+devbroker:!:230:230:permission_broker:/dev/null:/bin/false
+biod:!:282:282:biometrics daemon:/dev/null:/bin/false
+pciguard:!:20165:20165:External PCI device authorization daemon:/dev/null:/bin/false
+crash:!:20137:20137:Crash reporter daemon.:/dev/null:/bin/false
+easy-unlock:!:249:249:Daemon for managing crypto operations for Easy Unlock:/dev/null:/bin/false
+crosvm:!:299:299:CrOS virtual machine monitor:/dev/null:/bin/false
+arc-data-snapshotd:!:20153:20153:User for arc-data-snapshotd service.:/dev/null:/bin/false
+bluetooth:!:218:218:bluez:/dev/null:/bin/false
+p2p:!:239:239:p2p autoupdate helpers:/dev/null:/bin/false
+kerberosd:!:20131:20131:kerberos manager daemon:/dev/null:/bin/false
+oobe_config_save:!:20122:20122:oobe config save utility:/dev/null:/bin/false
+kerberosd-exec:!:20138:20138:kerberos daemon process executing third party code:/dev/null:/bin/false
+oobe_config_restore:!:20121:20121:oobe config restore utility:/dev/null:/bin/false
+dlcservice:!:20118:20118:dbus service for CrOS DownLoadable Content (DLC).:/dev/null:/bin/false
+usb_bouncer:!:20124:20124:maintains device allowlist for usbguard:/dev/null:/bin/false
+cros_healthd:!:20134:20134:User for diagnostics and telemetry services.:/dev/null:/bin/false
+authpolicyd:!:254:254:authpolicy daemon:/dev/null:/bin/false
+secanomaly:!:20178:20178:security anomaly detection daemon:/dev/null:/bin/false
+healthd_ec:!:20142:20142:User for accessing ectool within debugd.:/dev/null:/bin/false
+authpolicyd-exec:!:607:607:authpolicy process executor:/dev/null:/bin/false
+cras:!:600:600:CrOS audio video daemon:/dev/null:/bin/false
+typecd:!:20146:20146:CrOS USB Type C Daemon:/dev/null:/bin/false
+ml-service:!:20106:20106:CrOS Machine Learning service:/dev/null:/bin/false
+typecd_ec:!:20168:20168:User for accessing ectool within debugd for USB Type C functionality.:/dev/null:/bin/false
+ml-service-dbus:!:20177:20177:Owner of the CrOS Machine Learning D-Bus service:/dev/null:/bin/false
+cros-disks:!:213:213:CrOS disk managing daemon:/dev/null:/bin/false
+ntfs-3g:!:300:300:NTFS FUSE-based filesystem daemon:/dev/null:/bin/false
+fuse-archivemount:!:311:311:FUSE-based archive mounter:/dev/null:/bin/false
+fuse-exfat:!:302:302:FUSE-based exfat FS daemon:/dev/null:/bin/false
+fuse-rar2fs:!:308:308:FUSE-based RAR mounter:/dev/null:/bin/false
+fuse-zip:!:309:309:FUSE-based ZIP mounter:/dev/null:/bin/false
+fuse-sshfs:!:305:305:FUSE-based SFTP client:/dev/null:/bin/false
+fuse-drivefs:!:304:304:FUSE-based DriveFS daemon:/dev/null:/bin/false
+mkfs:!:425:425:Disk Partition Formatter:/dev/null:/bin/false
+trunks:!:251:251:Chromium OS trunks daemon runs as this user:/dev/null:/bin/false
+power:!:228:228:power management daemon:/dev/null:/bin/false
+vpn:!:20174:20174:CrOS VPN clients:/dev/null:/bin/false
+brltty:!:240:240:braille displays:/dev/null:/bin/false
+iioservice:!:20158:20158:CrOS IIO service daemon:/dev/null:/bin/false
+tpm_manager:!:252:252:Chromium OS tpm_manager daemon runs as this user:/dev/null:/bin/false
+arc-camera:!:603:603:CrOS ARC camera service daemon:/dev/null:/bin/false
+chaps:!:223:223:chaps PKCS11 daemon:/dev/null:/bin/false
+attestation:!:247:247:Chromium OS attestation daemon runs as this user:/dev/null:/bin/false
+pkcs11:!:208:208:PKCS11 clients:/dev/null:/bin/false
+cdm-oemcrypto:!:265:265:content decryption module and Widevine OEMCrypto daemon:/dev/null:/bin/false
+shill-crypto:!:237:237:shill's crypto-util:/dev/null:/bin/false
+shill-scripts:!:295:295:shill's debug scripts (when run via debugd):/dev/null:/bin/false
+nfqueue:!:232:232:netfilter-queue:/dev/null:/bin/false
+u2f:!:291:291:second-factor authentication daemon:/dev/null:/bin/false
+patchpaneld:!:284:284:CrOS guest networking service daemon:/dev/null:/bin/false
+bootlockboxd:!:20107:20107:bootlockbox daemon:/dev/null:/bin/false
+cryptohome:!:292:292:cryptohome service and client:/dev/null:/bin/false
+crosvm-root:!:20182:20182:Root of the concierge user namespace:/dev/null:/bin/false
+dns-proxy:!:20167:20167:CrOS DNS proxy daemon:/dev/null:/bin/false
+arc-keymasterd:!:20132:20132:CrOS Keymaster daemon:/dev/null:/bin/false
+syslog:!:202:202:rsyslog:/dev/null:/bin/false
+vm_cicerone:!:20112:20112:Daemon for VM container communication:/dev/null:/bin/false
+seneschal:!:20114:20114:Steward of the user's /home:/dev/null:/bin/false
+seneschal-dbus:!:20115:20115:Owner of the seneschal dbus service:/dev/null:/bin/false
+debugd:!:216:216:debug daemon:/dev/null:/bin/false
+system-proxy:!:20154:20154:CrOS System-wide proxy daemon:/dev/null:/bin/false
+debugd-logs:!:235:235:access to unprivileged debugd logs:/dev/null:/bin/false
+debugfs-access:!:605:605:access to debugfs:/dev/null:/bin/false
