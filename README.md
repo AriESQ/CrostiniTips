@@ -1,17 +1,25 @@
 # CrostiniTips
 ## Tips for running linux containers (LXC) on ChromeOS via Crostini
 
-Crostini is a system for running LXC containers on the ChromeOS operating system. Crostini was designed with a focus on insulating the operating system from attacks or exploits coming from the containers. This is great for developers who want a secure, managed, operating system; while also having access to a linux development environment.
+[Crostini](https://chromeos.dev/en/linux) is a system for running Linux in [LXC](https://linuxcontainers.org/lxc/introduction/) containers on the ChromeOS operating system. Crostini was designed with a focus on insulating ChromeOS from attacks or exploits coming from inside the containers. This is great for developers who want a secure, managed, operating system; while also having access to a linux development environment.
 
-Crostini's architecture is complex. There are several layers of virtualization technologies that are nested within each other. As well as communication and control channels that traverse layers. This document will help you understand this architecture so that you can run and troubleshoot LXC containers on ChromeOS. 
+LXC containers provides the user a full operating environment, including a command-line shell; and optionally, a graphical user interface. It is comparable to a virtual machine, except that LXC containers are less demanding on resources (CPU, memory) because they share the system kernel amongst multiple containers. Rather than needing separate kernels per virtual machine. LXC containers differ from Docker containers, in that Docker is mainly used to virtualize single applications, like a web-server, rather than a whole interactive operating environment.   
+
+Crostini's architecture is complex. There are several layers of virtualization technologies nested within each other; as well as control channels that traverse layers. The ChromeOS setup instructions are sufficient for basic operation. However, understanding the architecture and terminology is helpful for tracking down solutions in the event that something doesn't breaks. And understanding how the system is designed is important when making use of the more advanced capabilities. 
+
+## Quickstart Guide
+Crostini runs well without any major configuration. If you just want to get started running Linux on your ChromeOS device, the [instructions](https://chromeos.dev/en/linux/setup) from Google are good. ChromeOS devices from 2019 onwards generally support Crostini. If your device is older, you can check if it is [supported](https://sites.google.com/a/chromium.org/dev/chromium-os/chrome-os-systems-supporting-linux). If your ChromeOS device is controlled by an educational organization, the feature may have been disabled.
+
+Before following the Google install directions, one small improvement is to go into the Chrome browser and type `chrome://flags#crostini-multi-container` in the address bar, and enable this feature. As of Chrome version 98, on the Beta channel, this enables some additional options in the user interface to manage multiple linux instances.
 
 ## ChromeOS vs ChromiumOS and Open Source Software
-ChromiumOS is an Open Source Project, [founded by Google](https://blog.chromium.org/2009/12/whats-difference-between-chromium-os.html). Contributors, including Google employees in their professional capacities contribute to ChromiumOS. Google then pulls from the ChromiumOS source tree to build their commercial ChromeOS products. Just be aware that if you are looking at the ChromiumOS sources to understand your ChromeOS device there may be subtle differences.
+ChromiumOS is Open Source Software, the project was [founded by Google](https://blog.chromium.org/2009/12/whats-difference-between-chromium-os.html). Software contributors, including Google employees in their professional capacities, contribute to ChromiumOS. Google then pulls from the ChromiumOS source tree to build their commercial ChromeOS products. The Chromium web browser operates on an identical model, being the underlying source code for Google's Chrome browser. For simplicity, we will refer to ChromeOS and Chrome browser.
 
 ## Crostini Architecture Overview
+
 ![Crostini Services Diagram](./images/crostini_services.png "crostini_services.png")
 
-This architecture diagram from the [Crostini Developer Guide](https://chromium.googlesource.com/chromiumos/docs/+/HEAD/crostini_developer_guide.md) is important for understanding Crostini's various subsystems and how they interact. It can be read in tandem with [Running Custom Containers Under Chrome OS](https://chromium.googlesource.com/chromiumos/docs/+/HEAD/containers_and_vms.md), where the Overview sections gives a concise description of each of the subsystems.
+This architecture diagram from the [Crostini Developer Guide](https://chromium.googlesource.com/chromiumos/docs/+/HEAD/crostini_developer_guide.md) is helpful for understanding Crostini's various subsystems and how they interact. It can be read in tandem with [Running Custom Containers Under Chrome OS](https://chromium.googlesource.com/chromiumos/docs/+/HEAD/containers_and_vms.md), where the Overview sections gives a concise description of each of the subsystems. The following description is intended as a reference you can come back to, and may make more sense after getting some experience with running LXC linux containers.
 
 On this chart, CrOS is ChromeOS, the host's operating system (light blue background). Termina VM (pink background) is a special, read-only, virtual machine instance that runs the LXD software that manages the LXC containers. Note it is the name of a virtual machine instance, rather than a service. In traditional terms it can be referred to as a "guest operating system."
 
