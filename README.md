@@ -19,28 +19,42 @@ ChromiumOS is Open Source Software, the project was [founded by Google](https://
 
 ![Crostini Services Diagram](./images/crostini_services.png "crostini_services.png")
 
-This architecture diagram from the [Crostini Developer Guide](https://chromium.googlesource.com/chromiumos/docs/+/HEAD/crostini_developer_guide.md) is helpful for understanding Crostini's various subsystems and how they interact. It can be read in tandem with [Running Custom Containers Under Chrome OS](https://chromium.googlesource.com/chromiumos/docs/+/HEAD/containers_and_vms.md), where the Overview sections gives a concise description of each of the subsystems. The following description is intended as a reference you can come back to, and may make more sense after getting some experience with running LXC linux containers.
+This architecture diagram from the [Crostini Developer Guide](https://chromium.googlesource.com/chromiumos/docs/+/HEAD/crostini_developer_guide.md) is helpful for understanding Crostini's various subsystems and how they interact. It should be read in tandem with [Running Custom Containers Under Chrome OS](https://chromium.googlesource.com/chromiumos/docs/+/HEAD/containers_and_vms.md), where the Overview sections gives a concise description of each of the subsystems. The following description is intended as a reference you can come back to, and may make more sense after getting some experience with running LXC linux containers.
 
-On this chart, CrOS is ChromeOS, the host's operating system (light blue background). Termina VM (pink background) is a special, read-only, virtual machine instance that runs the LXD software that manages the LXC containers. Note it is the name of a virtual machine instance, rather than a service. In traditional terms it can be referred to as a "guest operating system."
+On this chart, virtualization boundaries are represented with rounded corners (CrOS, Termina VM, Debian Container). Services and daemons are represented with square boxes. Communication channels are represented with solid lines. The dashed lines appear to represent a launch or initialization rather than a persistent communication channel. Note "maitred pid 1" is the only service/daemon with a dashed outline. This appears to reflect it's unique position as an "agent", which can be discussed later.
 
-Two important pieces, not pictured, are [crosh](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/crosh) and [crossvm](https://google.github.io/crosvm/). Crosh is a limited command-line shell that can interact with the ChromeOS operating system. It is used for launching virtual machines. Crossvm is a "virtual machine monitor". In more traditional terms it can be thought of as a [type-2](https://en.wikipedia.org/wiki/Hypervisor#Classification) hypervisor.
+CrOS is ChromeOS, the host's operating system (light blue background). Termina VM (pink background) is a special, read-only, virtual machine instance that runs the LXD software that manages the LXC containers. Note it is the name of a virtual machine instance, rather than a service. In traditional terms it can be referred to as a "guest operating system." Debian Container (light yellow background) is an LXC container. The default LXC container is named Penguin. User-launched containers would be represented alongside Debian Container, as independent instances .
 
-Debian Container (light yellow background) is an LXC container. The default LXC container in named Penguin. User-launched containers would be represented here on the diagram. The nesting hierarchy of the various virtualization environments can be confusing. This tree shows the relationships.    
+The nesting hierarchy of the various virtualization environments can be confusing. This tree shows the relationships.    
 
 ```
 ChromeOS
   ├── Chrome (Browser process)
-  └── CrossVM (Hypervisor)
+  └── CrosVM (Hypervisor)
       └── Termina VM (Virtual Machine instance)
           └── LXD (Daemon)
               ├── Penguin LXC (Container)
               └── LXC 2 (Optional user-specified container)
 ```
 
-[Garcon](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/garcon/) and [Sommelier](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/sommelier/) (yellow) are daemons that run inside LXC containers. They are installed with the [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) package. They communicate directly with the operating system, crossing the isolation boundary of the virtual machine.
+Two important pieces, not pictured, are [crosh](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/crosh) and [crosvm](https://google.github.io/crosvm/). Crosh is a limited command-line shell that can interact with the ChromeOS operating system. It is used for launching virtual machines. Crossvm is a "virtual machine monitor". In more traditional terms it can be thought of as a [type-2](https://en.wikipedia.org/wiki/Hypervisor#Classification) hypervisor. Crossvm is the execution environment for the special Termina virtual machine.
+
+[Garcon](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/garcon/), [Sommelier](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/sommelier/),and [Vshd](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/vsh/) (yellow) are daemons that run inside LXC containers. They are installed with the [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) package. They communicate directly with the operating system, crossing the isolation boundary of the LXC container and the virtual machine, to talk to Chrome running on the operating system.
+
+This should be enough of an understanding for intermediate-level running and troubleshooting of LXC linux containers. But since you've made it this far, we can briefly give meaning to the rest of the diagram.
+
+There are a couple of flavors of communication channel: [D-Bus](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/dbus/), [gRPC](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools#wire-format), [REST API over unix socket](https://chromium.googlesource.com/chromiumos/platform/tremplin/+/HEAD/src/chromiumos/tremplin?autodive=0/), and [Vsock](https://chromium.googlesource.com/chromiumos/platform2/+/master/vm_tools/vsh). Most of the messages passing through these channels are [protobuf](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/proto) format.
+
+[Seneschal](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/seneschal/) uses the [Plan 9 Filesystem Protocol](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/9s/) to share a ChromeOS user's files (i.e. Downloads) with virtual machines (i.e. Termina). Some system (Tremplin?) then makes these shared files available within LXC containers. This can be tested experimentally by selecting "share a file with linux" in the ChromeOS file manager; and then navigating to a user's home directory in the LXC linux container.
+
+
+
+Tremplin - Translates gRPC between Cicerone on the host and LXD in the VM.
 
 ## cros-container-guest-tools
-The [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) enable communication between a LXC container and the ChromeOS operating system, traversing the CrosVM virtual machine boundary. These tools are installed by attaching a virtual disk inside the LXC container and mounting it at `/opt/google/cros-containers`. [lxc_setup.sh](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh) is run when the container is first created, which installs the `cros-guest-tools`. The guest tools are started in the lxc container via systemd unite files in `/etc/systemd/users/`.    
+The [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) enable communication between a LXC container and the ChromeOS operating system, traversing the virtual machine boundary. These tools are installed by attaching a virtual disk inside the LXC container and mounting it at `/opt/google/cros-containers`. [lxc_setup.sh](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh) is run when the container is first created, which installs the `cros-guest-tools`. The guest tools are started in the lxc container via systemd unit files in `/etc/systemd/users/`.
+
+
 
 ### Installing cros-container-guest-tools on alternative containers
 Add appropriate apt repo key - https://www.google.com/linuxrepositories/
@@ -87,7 +101,7 @@ echo "deb https://storage.googleapis.com/cros-packages/98 bullseye main" > /etc/
 apt update
 apt install -y cros-guest-tools
 ```
-At some point this install will fail. Possibly on the `cros-ui-config` package. This appears related to the Chromium OS Sommelier package which provides the Wayland service for graphical dekstop apps.
+At some point this install will fail. Possibly on the `cros-ui-config` package. This appears related to the Chromium OS Sommelier package which provides the Wayland service for graphical apps.
 
 Shutdown the container with `shutdown -P now`
 
@@ -146,7 +160,40 @@ The command `ps aux --forest` is useful in seeing how the running system is orga
 
 The control virtual machine, named termina is loaded from `/run/imageloader/termina-dlc/package/root/`
 
+## Sharing ChromeOS files into an LXC container
+Doing this from within ChromeOS is simple. In the Files app you right click a folder and select "Share with Linux." You can see shared folders in Settings > Advanced > Linux Development Environment > Manage Shared Folders.
+
+The mechanism that accomplishes this is complex. The Chrome OS UI interacts with [Seneschal](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools#seneschal) over dbus and shares a narrowly scoped file system object with the virtual machine.
+
+[Containers_and_vms.md](https://chromium.googlesource.com/chromiumos/docs/+/HEAD/containers_and_vms.md#Overview)
+```
+Seneschal is a daemon that runs in Chrome OS that handles lifecycle management of 9P servers. When Concierge starts a VM, it sends a message to Seneschal to also start a 9s instance for that VM. Then, while configuring the VM, Concierge sends a message to Maitred instructing it to connect to the 9s instance and mount it inside the VM.
+```
+ This file system object is then somehow mapped into the LXC containers. It is unclear which of the several services maps the file system object from the virtual machine into the LXC container.
+
+Presumably the commands to mount files into the container should be in protobufs definitions, but I cannot find anything.
+https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/proto
+
+Tremplin seems like a likely candidate, it has a communications channel to the Operating system via [Cicerone](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/cicerone/container.cc#45) And there are references elsewhere in the code about Tremplin doing [file operations](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh#35) inside containers.
+
+[Maitrid](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools#maitred) is also a potential candidate for mapping file systems from the OS into containers.
+
+This complexity is likely a result of the security philosophy underpinning Crostini. The security features around anything crossing security boundaries is strict. In this case there are strict processes around sharing files between host and containers.
+
+[Garcon README.md](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/garcon/#garcon)
+```
+Garcon receives a token from the host which is used to identify itself in all communication back to the host. This is bind-mounted into the container from the VM.
+```
+
+It is possible that the host mounts the filesystem into the VM, and also pushes the availability of the filesystem to Garcon, which then could mount it in the container. Alterantely, it is possible the host mounts the filesystem into the VM, and then via Tremplin, tells LXD to make the filesystem available into the container.
+
+
+
+
+
 ## Troubleshooting
+* A list of useful Chrome OS URLS is available in your browser via `chrome://chrome-urls
+`
 * If Linux Developer Options do not appear or the multiple container UI doesn't appear, try restarting the system. Or try disabling and re-enabling the crostini-multi-container flag, or linux development environment.
 
 * If you are working off of tutorials, check that they are somewhat recent, ChromeOS/Crostini are developing rapidly.
@@ -160,6 +207,7 @@ https://chromium.googlesource.com/chromiumos/docs/+/HEAD/costini_developer_guide
 https://chromium.googlesource.com/chromiumos/docs/+/HEAD/containers_and_vms.md
 https://chromium.googlesource.com/chromium/src/+/main/chrome/browser/ash/crostini
 https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/vsh/
+https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/docs/logging.md
 
 https://chromium.googlesource.com/chromiumos/docs/+/HEAD/dbus_in_chrome.md
 https://www.chromium.org/developers/mus-ash/ - discontinued 2019
@@ -178,7 +226,7 @@ https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/docs/init
 
 https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/init/vm_concierge.conf - nsenter details
 
-https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh#35 -Confirms that Tremplin writes /etc/apt/sources.d/cros.list (Possible also writes sytemd unit files then?)
+https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh#35 -Confirms that Tremplin writes /etc/apt/sources.d/cros.list (Possible also writes sytsemd unit files then?)
 
 Original place where cros-containers repo was found.
 https://www.reddit.com/r/Crostini/wiki/howto/install-behind-a-proxy
