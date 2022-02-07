@@ -7,15 +7,17 @@ LXC containers provides the user a full operating environment, including a comma
 
 Crostini's architecture is complex. There are several layers of virtualization technologies nested within each other; as well as control channels that traverse layers. The Chrome OS setup instructions are sufficient for basic operation. However, understanding the architecture and terminology is helpful for tracking down solutions in the event that something doesn't breaks. And understanding how the system is designed is important when making use of the more advanced capabilities. 
 
-## Quickstart Guide
+## Chrome OS vs ChromiumOS and Open Source Software
+
+ChromiumOS is Open Source Software, the project was [founded by Google](https://blog.chromium.org/2009/12/whats-difference-between-chromium-os.html). Software contributors, including Google employees in their professional capacities, contribute to ChromiumOS. Google then pulls from the ChromiumOS source tree to build their commercial Chrome OS products. The Chromium web browser operates on an identical model, being the underlying source code for Google's Chrome browser. For simplicity, we will refer to Chrome OS and Chrome browser.
+
+## Quickstart Guide  
+
 Crostini runs well without any major configuration. If you just want to get started running Linux on your Chrome OS device, the [instructions](https://chromeos.dev/en/linux/setup) from Google are good. Chrome OS devices from 2019 onwards generally support Crostini. If your device is older, you can check if it is [supported](https://sites.google.com/a/chromium.org/dev/chromium-os/chrome-os-systems-supporting-linux). If your Chrome OS device is controlled by an educational organization, the feature may have been disabled.
 
 Before following the Google install directions, one small improvement is to go into the Chrome browser and type `chrome://flags#crostini-multi-container` in the address bar, and enable this feature. As of Chrome version 98, on the Beta channel, this enables some additional options in the user interface to manage multiple linux instances.
 
-## Chrome OS vs ChromiumOS and Open Source Software
-ChromiumOS is Open Source Software, the project was [founded by Google](https://blog.chromium.org/2009/12/whats-difference-between-chromium-os.html). Software contributors, including Google employees in their professional capacities, contribute to ChromiumOS. Google then pulls from the ChromiumOS source tree to build their commercial Chrome OS products. The Chromium web browser operates on an identical model, being the underlying source code for Google's Chrome browser. For simplicity, we will refer to Chrome OS and Chrome browser.
-
-## Crostini Architecture Overview
+# Crostini Architecture Overview
 
 ![Crostini Services Diagram](./images/crostini_services.png "crostini_services.png")
 
@@ -55,23 +57,42 @@ There are a couple of flavors of communication channel: [D-Bus](https://chromium
 
 [Tremplin](https://chromium.googlesource.com/chromiumos/platform/tremplin/+/refs/heads/main) Translates gRPC between Cicerone on the host and LXD in the VM.
 
-## Getting started running custom LXC containers.
+
+# Getting started running additional LXC containers.
 In Chrome OS settings, go to Advanced > Developers> Linux development environment and enable "Linux development environment."
 
 In Chrome type `chrome://flags#crostini-multi-container` and enable the feature.
 
 Restart your Chrome OS device.
 
-Depending on your version of Chrome OS you may now have access to the "Manage Extra Containers" option under Advanced > Linux Development Environment.
+Depending on your version of Chrome OS (Chrome OS ver. 98 beta channel confirmed working) you may now have access to the "Manage Extra Containers" option under Advanced > Linux Development Environment.
 
 ![Manage Extra Containers](./images/ManageExtraContainers.png "ManageExtraContainers.png")
 
 At this point you have a pretty powerful setup. You can start/stop create/delete default LXC containers from this UI. From the desktop you can right-click (Alt-click) on the Terminal application, to choose which LXC container to connect to.
 
-## Building your own custom LXC contianers.
-Historically the tool to use was [lxc-templates](https://github.com/lxc/lxc-templates), which is available in most distributions' package manager. Presently, the LXC project reccomends using [distrobuilder](https://github.com/lxc/distrobuilder)
+# Running custom LXC containers.
+There are several places where ou can download pre-made LXC images, and run them directly. This requires placing a lot of trust in a third party that nothing malicious has slipped into those images. A user can also build their own LXC images using a variety of tools.
 
-## Installing Ubuntu
+Historically the tool to use was [lxc-templates](https://github.com/lxc/lxc-templates), which is available in most distributions' package manager. Presently, the LXC project recommends using [distrobuilder](https://github.com/lxc/distrobuilder)
+
+## cros-container-guest-tools
+The [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) enable communication between an LXC container and the Chrome OS operating system, traversing the virtual machine boundary. On a default installation, these tools are installed by attaching a virtual disk inside the LXC container and mounting it at `/opt/google/cros-containers`. [lxd_setup.sh](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh) is run when the container is first created, which installs the `cros-guest-tools`. The guest tools are started in the lxc container via systemd unit files in `/etc/systemd/users/`.
+
+If you are using a custom LXC container, you probably want to install these tools manually.
+
+### Debian, Ubuntu or apt/.deb package managers.
+* Add appropriate apt repo key - https://www.google.com/linuxrepositories/
+* Add Google's repository to your system. Look at `/etc/apt/sources.list.d/crost.list` on your default Penguin LXC, and create an identical file and contents on your new install.
+* Do `apt install cros-guest-tools`  
+
+### Redhat or .RPM based package managers
+https://centos.pkgs.org/8/epel-x86_64/cros-guest-tools-1.0-0.39.20200806git19eab9e.el8.noarch.rpm.html
+
+### Arch Linux (reported broken)
+https://aur.archlinux.org/packages/cros-container-guest-tools-git/
+
+## Installing Ubuntu as a custom LXC Container
 Ubuntu is based on Debian, just like the default Penguin container. As such, the `cros-guest-tools` .deb installer mostly works. Sommelier doesn't install, so Wayland/GUI apps don't work, but you can get the integration with the default Terminal app working for a usable command-line experience.
 
 You can use Advanced > Developers > Linux Development Enviornment > Manage extra containers > Create dialog to get started.
@@ -105,24 +126,7 @@ https://github.com/quack1-1/scripts
 https://github.com/pitastrudl/wekanwiki/blob/master/Chromebook.md#5-install-crostini-packages
 https://github.com/LukeShortCloud/rootpages/blob/main/src/linux_distributions/chromium_os.rst
 
-## cros-container-guest-tools
-The [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) enable communication between an LXC container and the Chrome OS operating system, traversing the virtual machine boundary. These tools are installed by attaching a virtual disk inside the LXC container and mounting it at `/opt/google/cros-containers`. [lxd_setup.sh](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh) is run when the container is first created, which installs the `cros-guest-tools`. The guest tools are started in the lxc container via systemd unit files in `/etc/systemd/users/`.
-
-### Installing cros-container-guest-tools on apt (.deb) base linux distributions
-* Add appropriate apt repo key - https://www.google.com/linuxrepositories/
-* Add Google's repository to your system. Look at `/etc/apt/sources.list.d/crost.list` on your default Penguin LXC, and create an identical file and contents on your new install.
-* Do `apt install cros-guest-tools`  
-
-For Redhat:
-https://centos.pkgs.org/8/epel-x86_64/cros-guest-tools-1.0-0.39.20200806git19eab9e.el8.noarch.rpm.html
-
-Arch Linux (reported broken):
-https://aur.archlinux.org/packages/cros-container-guest-tools-git/
-
 ## Installing Red Hat Linux distributions.
-
-
-
 
 ## Advanced LXC container operations
 
@@ -137,7 +141,6 @@ lxc remote list
 If you launch an image that you don't have locally, it will first download it. To avoid this you can cp it locally first. be sure to --copy-aliases
 
 Adding a new remote:
-
 
 lxc info --resources (information about running server)
 for more info, append --debug
