@@ -45,29 +45,15 @@ This should be enough of an understanding for intermediate-level running and tro
 
 There are a couple of flavors of communication channel: [D-Bus](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/dbus/), [gRPC](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools#wire-format), [REST API over unix socket](https://chromium.googlesource.com/chromiumos/platform/tremplin/+/HEAD/src/chromiumos/tremplin?autodive=0/), and [Vsock](https://chromium.googlesource.com/chromiumos/platform2/+/master/vm_tools/vsh). Most of the messages passing through these channels are [protobuf](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/proto) format.
 
-[Seneschal](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/seneschal/) uses the [Plan 9 Filesystem Protocol](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/9s/) to share a ChromeOS user's files (i.e. Downloads) with virtual machines (i.e. Termina). Some system (Tremplin?) then makes these shared files available within LXC containers. This can be tested experimentally by selecting "share a file with linux" in the ChromeOS file manager; and then navigating to a user's home directory in the LXC linux container.
+[Seneschal](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/seneschal/) uses the [Plan 9 Filesystem Protocol](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/9s/) to share a ChromeOS user's files (i.e. Downloads) with virtual machines (i.e. Termina), which are then mounted into a user's home directory in the LXC container.
 
+[Concierge](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/concierge) is responsible for starting, stopping, and tracking virtual machines. It communicates to ChromeOS over [d-bus](https://chromium.googlesource.com/chromiumos/platform/system_api/+/HEAD/dbus/vm_concierge/).
 
+[Cicerone](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/cicerone/) is responsible for communicating with containers. It talks to the [Garcon] service, installed by cros-guest-tools in LXC containers. It communicates to ChromeOS over [d-bus](https://chromium.googlesource.com/chromiumos/platform/system_api/+/HEAD/dbus/vm_cicerone)
 
-Tremplin - Translates gRPC between Cicerone on the host and LXD in the VM.
+[Vmlog_forwarder and vm_syslog](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/docs/logging.md) work together to capture logs from virtual machines and store them in ChromeOS.
 
-## cros-container-guest-tools
-The [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) enable communication between a LXC container and the ChromeOS operating system, traversing the virtual machine boundary. These tools are installed by attaching a virtual disk inside the LXC container and mounting it at `/opt/google/cros-containers`. [lxc_setup.sh](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh) is run when the container is first created, which installs the `cros-guest-tools`. The guest tools are started in the lxc container via systemd unit files in `/etc/systemd/users/`.
-
-
-
-### Installing cros-container-guest-tools on alternative containers
-Add appropriate apt repo key - https://www.google.com/linuxrepositories/
-Add repo
-apt install cros-guest-tools
-https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh
-
-
-For Redhat:
-https://centos.pkgs.org/8/epel-x86_64/cros-guest-tools-1.0-0.39.20200806git19eab9e.el8.noarch.rpm.html
-
-Arch Linux (reported broken):
-https://aur.archlinux.org/packages/cros-container-guest-tools-git/
+[Tremplin](https://chromium.googlesource.com/chromiumos/platform/tremplin/+/refs/heads/main) Translates gRPC between Cicerone on the host and LXD in the VM.
 
 ## Getting started running custom LXC containers.
 In ChromeOS settings, go to Advanced > Developers> Linux development environment and enable "Linux development environment."
@@ -116,6 +102,20 @@ https://github.com/quack1-1/scripts
 https://github.com/pitastrudl/wekanwiki/blob/master/Chromebook.md#5-install-crostini-packages
 https://github.com/LukeShortCloud/rootpages/blob/main/src/linux_distributions/chromium_os.rst
 
+## cros-container-guest-tools
+The [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) enable communication between an LXC container and the ChromeOS operating system, traversing the virtual machine boundary. These tools are installed by attaching a virtual disk inside the LXC container and mounting it at `/opt/google/cros-containers`. [lxd_setup.sh](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh) is run when the container is first created, which installs the `cros-guest-tools`. The guest tools are started in the lxc container via systemd unit files in `/etc/systemd/users/`.
+
+### Installing cros-container-guest-tools on apt (.deb) base linux distributions
+* Add appropriate apt repo key - https://www.google.com/linuxrepositories/
+* Add Google's repository to your system. Look at `/etc/apt/sources.list.d/crost.list` on your default Penguin LXC, and create an identical file and contents on your new install.
+* Do `apt install cros-guest-tools`  
+
+For Redhat:
+https://centos.pkgs.org/8/epel-x86_64/cros-guest-tools-1.0-0.39.20200806git19eab9e.el8.noarch.rpm.html
+
+Arch Linux (reported broken):
+https://aur.archlinux.org/packages/cros-container-guest-tools-git/
+
 ## Installing Red Hat Linux distributions.
 
 
@@ -158,7 +158,7 @@ ChromeOS uses [Upstart](https://www.chromium.org/chromium-os/chromiumos-design-d
 
 The command `ps aux --forest` is useful in seeing how the running system is organized. You can see user, process, and child-process information.
 
-The control virtual machine, named termina is loaded from `/run/imageloader/termina-dlc/package/root/`
+The control virtual machine, named Termina is loaded from `/run/imageloader/termina-dlc/package/root/`
 
 ## Sharing ChromeOS files into an LXC container
 Doing this from within ChromeOS is simple. In the Files app you right click a folder and select "Share with Linux." You can see shared folders in Settings > Advanced > Linux Development Environment > Manage Shared Folders.
@@ -226,7 +226,7 @@ https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/docs/init
 
 https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/init/vm_concierge.conf - nsenter details
 
-https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh#35 -Confirms that Tremplin writes /etc/apt/sources.d/cros.list (Possible also writes sytsemd unit files then?)
+https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh#35 -Confirms that Tremplin writes /etc/apt/sources.d/cros.list (Possible also writes systemd unit files then?)
 
 Original place where cros-containers repo was found.
 https://www.reddit.com/r/Crostini/wiki/howto/install-behind-a-proxy
@@ -272,7 +272,8 @@ https://github.com/lxc
 
 ## Remotes for LXC container images
 
-https://us.lxd.images.canonical.com/
-https://us.lxd.images.canonical.com/meta/1.0/
-https://us.lxd.images.canonical.com/meta/1.0/index-system.1
-https://us.lxd.images.canonical.com/meta/1.0/index-user.1
+https://storage.googleapis.com/cros-containers
+https://us.lxd.images.canonical.com/  
+https://us.lxd.images.canonical.com/meta/1.0/  
+https://us.lxd.images.canonical.com/meta/1.0/index-system.1  
+https://us.lxd.images.canonical.com/meta/1.0/index-user.1  
