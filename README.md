@@ -1,19 +1,19 @@
 # CrostiniTips
 ## Tips for running linux containers (LXC) on ChromeOS via Crostini
 
-[Crostini](https://chromeos.dev/en/linux) is a system for running Linux in [LXC](https://linuxcontainers.org/lxc/introduction/) containers on the ChromeOS operating system. Crostini was designed with a focus on insulating ChromeOS from attacks or exploits coming from inside the containers. This is great for developers who want a secure, managed, operating system; while also having access to a linux development environment.
+[Crostini](https://chromeos.dev/en/linux) is a system for running Linux in [LXC](https://linuxcontainers.org/lxc/introduction/) containers on the Chrome OS operating system. Crostini was designed with a focus on insulating Chrome OS from attacks or exploits coming from inside the containers. This is great for developers who want a secure, managed, operating system; while also having access to a linux development environment.
 
 LXC containers provides the user a full operating environment, including a command-line shell; and optionally, a graphical user interface. It is comparable to a virtual machine, except that LXC containers are less demanding on resources (CPU, memory) because they share the system kernel amongst multiple containers. Rather than needing separate kernels per virtual machine. LXC containers differ from Docker containers, in that Docker is mainly used to virtualize single applications, like a web-server, rather than a whole interactive operating environment.   
 
-Crostini's architecture is complex. There are several layers of virtualization technologies nested within each other; as well as control channels that traverse layers. The ChromeOS setup instructions are sufficient for basic operation. However, understanding the architecture and terminology is helpful for tracking down solutions in the event that something doesn't breaks. And understanding how the system is designed is important when making use of the more advanced capabilities. 
+Crostini's architecture is complex. There are several layers of virtualization technologies nested within each other; as well as control channels that traverse layers. The Chrome OS setup instructions are sufficient for basic operation. However, understanding the architecture and terminology is helpful for tracking down solutions in the event that something doesn't breaks. And understanding how the system is designed is important when making use of the more advanced capabilities. 
 
 ## Quickstart Guide
-Crostini runs well without any major configuration. If you just want to get started running Linux on your ChromeOS device, the [instructions](https://chromeos.dev/en/linux/setup) from Google are good. ChromeOS devices from 2019 onwards generally support Crostini. If your device is older, you can check if it is [supported](https://sites.google.com/a/chromium.org/dev/chromium-os/chrome-os-systems-supporting-linux). If your ChromeOS device is controlled by an educational organization, the feature may have been disabled.
+Crostini runs well without any major configuration. If you just want to get started running Linux on your Chrome OS device, the [instructions](https://chromeos.dev/en/linux/setup) from Google are good. Chrome OS devices from 2019 onwards generally support Crostini. If your device is older, you can check if it is [supported](https://sites.google.com/a/chromium.org/dev/chromium-os/chrome-os-systems-supporting-linux). If your Chrome OS device is controlled by an educational organization, the feature may have been disabled.
 
 Before following the Google install directions, one small improvement is to go into the Chrome browser and type `chrome://flags#crostini-multi-container` in the address bar, and enable this feature. As of Chrome version 98, on the Beta channel, this enables some additional options in the user interface to manage multiple linux instances.
 
-## ChromeOS vs ChromiumOS and Open Source Software
-ChromiumOS is Open Source Software, the project was [founded by Google](https://blog.chromium.org/2009/12/whats-difference-between-chromium-os.html). Software contributors, including Google employees in their professional capacities, contribute to ChromiumOS. Google then pulls from the ChromiumOS source tree to build their commercial ChromeOS products. The Chromium web browser operates on an identical model, being the underlying source code for Google's Chrome browser. For simplicity, we will refer to ChromeOS and Chrome browser.
+## Chrome OS vs ChromiumOS and Open Source Software
+ChromiumOS is Open Source Software, the project was [founded by Google](https://blog.chromium.org/2009/12/whats-difference-between-chromium-os.html). Software contributors, including Google employees in their professional capacities, contribute to ChromiumOS. Google then pulls from the ChromiumOS source tree to build their commercial Chrome OS products. The Chromium web browser operates on an identical model, being the underlying source code for Google's Chrome browser. For simplicity, we will refer to Chrome OS and Chrome browser.
 
 ## Crostini Architecture Overview
 
@@ -23,21 +23,21 @@ This architecture diagram from the [Crostini Developer Guide](https://chromium.g
 
 On this chart, virtualization boundaries are represented with rounded corners (CrOS, Termina VM, Debian Container). Services and daemons are represented with square boxes. Communication channels are represented with solid lines. The dashed lines appear to represent a launch or initialization rather than a persistent communication channel. Note "maitred pid 1" is the only service/daemon with a dashed outline. This appears to reflect it's unique position as an "agent", which can be discussed later.
 
-CrOS is ChromeOS, the host's operating system (light blue background). Termina VM (pink background) is a special, read-only, virtual machine instance that runs the LXD software that manages the LXC containers. Note it is the name of a virtual machine instance, rather than a service. In traditional terms it can be referred to as a "guest operating system." Debian Container (light yellow background) is an LXC container. The default LXC container is named Penguin. User-launched containers would be represented alongside Debian Container, as independent instances .
+CrOS is Chrome OS, the host's operating system (light blue background). Termina VM (pink background) is a special, read-only, virtual machine instance that runs the LXD software that manages the LXC containers. Note it is the name of a virtual machine instance, rather than a service. In traditional terms it can be referred to as a "guest operating system." Debian Container (light yellow background) is an LXC container. The default LXC container is named Penguin. User-launched containers would be represented alongside Debian Container, as independent instances .
 
 The nesting hierarchy of the various virtualization environments can be confusing. This tree shows the relationships.    
 
 ```
-ChromeOS
+Chrome OS (Host Operating System)
   ├── Chrome (Browser process)
   └── CrosVM (Hypervisor)
-      └── Termina VM (Virtual Machine instance)
+      └── Termina VM (Guest Virtual Machine instance)
           └── LXD (Daemon)
               ├── Penguin LXC (Container)
               └── LXC 2 (Optional user-specified container)
 ```
 
-Two important pieces, not pictured, are [crosh](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/crosh) and [crosvm](https://google.github.io/crosvm/). Crosh is a limited command-line shell that can interact with the ChromeOS operating system. It is used for launching virtual machines. Crossvm is a "virtual machine monitor". In more traditional terms it can be thought of as a [type-2](https://en.wikipedia.org/wiki/Hypervisor#Classification) hypervisor. Crossvm is the execution environment for the special Termina virtual machine.
+Two important pieces, not pictured, are [crosh](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/crosh) and [crosvm](https://google.github.io/crosvm/). Crosh is a limited command-line shell that operates at the level of the Chrome OS operating system. It is used for launching virtual machines. Crossvm is a "virtual machine monitor". In more traditional terms it can be thought of as a [type-2](https://en.wikipedia.org/wiki/Hypervisor#Classification) hypervisor. Crossvm is the execution environment for the special Termina virtual machine.
 
 [Garcon](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/garcon/), [Sommelier](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/sommelier/),and [Vshd](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/vsh/) (yellow) are daemons that run inside LXC containers. They are installed with the [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) package. They communicate directly with the operating system, crossing the isolation boundary of the LXC container and the virtual machine, to talk to Chrome running on the operating system.
 
@@ -45,28 +45,31 @@ This should be enough of an understanding for intermediate-level running and tro
 
 There are a couple of flavors of communication channel: [D-Bus](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/dbus/), [gRPC](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools#wire-format), [REST API over unix socket](https://chromium.googlesource.com/chromiumos/platform/tremplin/+/HEAD/src/chromiumos/tremplin?autodive=0/), and [Vsock](https://chromium.googlesource.com/chromiumos/platform2/+/master/vm_tools/vsh). Most of the messages passing through these channels are [protobuf](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/proto) format.
 
-[Seneschal](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/seneschal/) uses the [Plan 9 Filesystem Protocol](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/9s/) to share a ChromeOS user's files (i.e. Downloads) with virtual machines (i.e. Termina), which are then mounted into a user's home directory in the LXC container.
+[Seneschal](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/seneschal/) uses the [Plan 9 Filesystem Protocol](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/9s/) to share a Chrome OS user's files (i.e. Downloads) with virtual machines (i.e. Termina), which are then mounted into a user's home directory in the LXC container.
 
-[Concierge](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/concierge) is responsible for starting, stopping, and tracking virtual machines. It communicates to ChromeOS over [d-bus](https://chromium.googlesource.com/chromiumos/platform/system_api/+/HEAD/dbus/vm_concierge/).
+[Concierge](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/concierge) is responsible for starting, stopping, and tracking virtual machines. It communicates to Chrome OS over [d-bus](https://chromium.googlesource.com/chromiumos/platform/system_api/+/HEAD/dbus/vm_concierge/).
 
-[Cicerone](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/cicerone/) is responsible for communicating with containers. It talks to the [Garcon] service, installed by cros-guest-tools in LXC containers. It communicates to ChromeOS over [d-bus](https://chromium.googlesource.com/chromiumos/platform/system_api/+/HEAD/dbus/vm_cicerone)
+[Cicerone](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/cicerone/) is responsible for communicating with containers. It talks to the [Garcon] service, installed by cros-guest-tools in LXC containers. It communicates to Chrome OS over [d-bus](https://chromium.googlesource.com/chromiumos/platform/system_api/+/HEAD/dbus/vm_cicerone)
 
-[Vmlog_forwarder and vm_syslog](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/docs/logging.md) work together to capture logs from virtual machines and store them in ChromeOS.
+[Vmlog_forwarder and vm_syslog](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/docs/logging.md) work together to capture logs from virtual machines and store them in Chrome OS.
 
 [Tremplin](https://chromium.googlesource.com/chromiumos/platform/tremplin/+/refs/heads/main) Translates gRPC between Cicerone on the host and LXD in the VM.
 
 ## Getting started running custom LXC containers.
-In ChromeOS settings, go to Advanced > Developers> Linux development environment and enable "Linux development environment."
+In Chrome OS settings, go to Advanced > Developers> Linux development environment and enable "Linux development environment."
 
 In Chrome type `chrome://flags#crostini-multi-container` and enable the feature.
 
-Restart your ChromeOS device.
+Restart your Chrome OS device.
 
-Depending on your version of ChromeOS you may now have access to the "Manage Extra Containers" option under Advanced > Linux Development Environment.
+Depending on your version of Chrome OS you may now have access to the "Manage Extra Containers" option under Advanced > Linux Development Environment.
 
 ![Manage Extra Containers](./images/ManageExtraContainers.png "ManageExtraContainers.png")
 
 At this point you have a pretty powerful setup. You can start/stop create/delete default LXC containers from this UI. From the desktop you can right-click (Alt-click) on the Terminal application, to choose which LXC container to connect to.
+
+## Building your own custom LXC contianers.
+Historically the tool to use was [lxc-templates](https://github.com/lxc/lxc-templates), which is available in most distributions' package manager. Presently, the LXC project reccomends using [distrobuilder](https://github.com/lxc/distrobuilder)
 
 ## Installing Ubuntu
 Ubuntu is based on Debian, just like the default Penguin container. As such, the `cros-guest-tools` .deb installer mostly works. Sommelier doesn't install, so Wayland/GUI apps don't work, but you can get the integration with the default Terminal app working for a usable command-line experience.
@@ -103,7 +106,7 @@ https://github.com/pitastrudl/wekanwiki/blob/master/Chromebook.md#5-install-cros
 https://github.com/LukeShortCloud/rootpages/blob/main/src/linux_distributions/chromium_os.rst
 
 ## cros-container-guest-tools
-The [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) enable communication between an LXC container and the ChromeOS operating system, traversing the virtual machine boundary. These tools are installed by attaching a virtual disk inside the LXC container and mounting it at `/opt/google/cros-containers`. [lxd_setup.sh](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh) is run when the container is first created, which installs the `cros-guest-tools`. The guest tools are started in the lxc container via systemd unit files in `/etc/systemd/users/`.
+The [cros-continer-guest-tools](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main) enable communication between an LXC container and the Chrome OS operating system, traversing the virtual machine boundary. These tools are installed by attaching a virtual disk inside the LXC container and mounting it at `/opt/google/cros-containers`. [lxd_setup.sh](https://chromium.googlesource.com/chromiumos/containers/cros-container-guest-tools/+/refs/heads/main/lxd/lxd_setup.sh) is run when the container is first created, which installs the `cros-guest-tools`. The guest tools are started in the lxc container via systemd unit files in `/etc/systemd/users/`.
 
 ### Installing cros-container-guest-tools on apt (.deb) base linux distributions
 * Add appropriate apt repo key - https://www.google.com/linuxrepositories/
@@ -149,19 +152,19 @@ Under settings you can do port forwarding.
 
 ## USB
 
-## ChromeOS internals
-For advanced troubleshooting, low-level development, or curiosity; one might wish to understand how ChromeOS works behind the scense. Especially considering that there appears to be some "magic" configuration of LXC containers.
+## Chrome OS internals
+For advanced troubleshooting, low-level development, or curiosity; one might wish to understand how Chrome OS works behind the scense. Especially considering that there appears to be some "magic" configuration of LXC containers.
 
-It is possible to put a ChromeOS device into Developer Mode, by holding down ESC+Refresh while powering up the device. You will be prompted with warnings that continuing will wipe user data off the device. Once you complete the ChromeOS device setup, you can enter CRoSH shell (Ctrl+Alt+T) and then type `shell` to log into a non-virtualized, "bare-metal" shell on the device. You should see a prompt of `chronos@localhost`. The `chronos` user has sudo privileges.
+It is possible to put a Chrome OS device into Developer Mode, by holding down ESC+Refresh while powering up the device. You will be prompted with warnings that continuing will wipe user data off the device. Once you complete the Chrome OS device setup, you can enter CRoSH shell (Ctrl+Alt+T) and then type `shell` to log into a non-virtualized, "bare-metal" shell on the device. You should see a prompt of `chronos@localhost`. The `chronos` user has sudo privileges.
 
-ChromeOS uses [Upstart](https://www.chromium.org/chromium-os/chromiumos-design-docs/boot-design/) as it's initialization (init) system. System configuration is stored in `/etc/init/`, and `/sbin/initctl` can be used to quest the state of services. By default neither `/sbin` or `/usr/sbin` are in `$PATH`, although you will find useful executables there.
+Chrome OS uses [Upstart](https://www.chromium.org/chromium-os/chromiumos-design-docs/boot-design/) as it's initialization (init) system. System configuration is stored in `/etc/init/`, and `/sbin/initctl` can be used to quest the state of services. By default neither `/sbin` or `/usr/sbin` are in `$PATH`, although you will find useful executables there.
 
 The command `ps aux --forest` is useful in seeing how the running system is organized. You can see user, process, and child-process information.
 
 The control virtual machine, named Termina is loaded from `/run/imageloader/termina-dlc/package/root/`
 
-## Sharing ChromeOS files into an LXC container
-Doing this from within ChromeOS is simple. In the Files app you right click a folder and select "Share with Linux." You can see shared folders in Settings > Advanced > Linux Development Environment > Manage Shared Folders.
+## Sharing Chrome OS files into an LXC container
+Doing this from within Chrome OS is simple. In the Files app you right click a folder and select "Share with Linux." You can see shared folders in Settings > Advanced > Linux Development Environment > Manage Shared Folders.
 
 The mechanism that accomplishes this is complex. The Chrome OS UI interacts with [Seneschal](https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools#seneschal) over dbus and shares a narrowly scoped file system object with the virtual machine.
 
@@ -196,7 +199,7 @@ It is possible that the host mounts the filesystem into the VM, and also pushes 
 `
 * If Linux Developer Options do not appear or the multiple container UI doesn't appear, try restarting the system. Or try disabling and re-enabling the crostini-multi-container flag, or linux development environment.
 
-* If you are working off of tutorials, check that they are somewhat recent, ChromeOS/Crostini are developing rapidly.
+* If you are working off of tutorials, check that they are somewhat recent, Chrome OS/Crostini are developing rapidly.
 
 
 ___
@@ -253,6 +256,7 @@ https://blog.merzlabs.com/posts/yubikey-crostini/
 
 https://stgraber.org/2016/03/11/lxd-2-0-blog-post-series-012/
 
+
 https://linuxcontainers.org/lxd/docs/master/authentication/
 
 ## Source code for reference
@@ -273,6 +277,7 @@ https://github.com/lxc
 ## Remotes for LXC container images
 
 https://storage.googleapis.com/cros-containers
+http://cloud-images.ubuntu.com/releases/
 https://us.lxd.images.canonical.com/  
 https://us.lxd.images.canonical.com/meta/1.0/  
 https://us.lxd.images.canonical.com/meta/1.0/index-system.1  
