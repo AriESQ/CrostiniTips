@@ -121,10 +121,10 @@ On my system this immediately dropped me into a shell as user `ubuntu` on the lx
 
 Further research can be done into de-coupling the gui and sound bits from the `cros-guest-tools` .deb meta-package, and only installing those guest extensions needed for a minimal Ubuntu install.
 
-Possible workarounds to GUI issue: 
-https://github.com/quack1-1/scripts
-https://github.com/pitastrudl/wekanwiki/blob/master/Chromebook.md#5-install-crostini-packages
-https://github.com/LukeShortCloud/rootpages/blob/main/src/linux_distributions/chromium_os.rst
+Possible workarounds to GUI issue:  
+https://github.com/quack1-1/scripts  
+https://github.com/pitastrudl/wekanwiki/blob/master/Chromebook.md#5-install-crostini-packages  
+https://github.com/LukeShortCloud/rootpages/blob/main/src/linux_distributions/chromium_os.rst  
 
 ## Installing Red Hat Linux distributions.
 
@@ -194,15 +194,11 @@ Garcon receives a token from the host which is used to identify itself in all co
 It is possible that the host mounts the filesystem into the VM, and also pushes the availability of the filesystem to Garcon, which then could mount it in the container. Alterantely, it is possible the host mounts the filesystem into the VM, and then via Tremplin, tells LXD to make the filesystem available into the container.
 
 
-
-
-
 ## Troubleshooting
-* A list of useful Chrome OS URLS is available in your browser via `chrome://chrome-urls
+* If you are working off of tutorials, check that they are somewhat recent, Chrome OS/Crostini are developing rapidly.
+* A list of useful Chrome OS URLS is available in your browser via `chrome://chrome-urls`
 `
 * If Linux Developer Options do not appear or the multiple container UI doesn't appear, try restarting the system. Or try disabling and re-enabling the crostini-multi-container flag, or linux development environment.
-
-* If you are working off of tutorials, check that they are somewhat recent, Chrome OS/Crostini are developing rapidly.
 
 
 ___
