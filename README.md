@@ -148,20 +148,29 @@ lxc remote list
 
 If you launch an image that you don't have locally, it will first download it. To avoid this you can cp it locally first. be sure to --copy-aliases
 
+`lxc image copy <source remote>:<alias> <destination remote>: --copy-aliases`
+`lxc image copy images:focal local: --copy-aliases`
+
 Adding a new remote:
 
 lxc info --resources (information about running server)
 for more info, append --debug
 
-And number of profiles can be applied to a container. So you could have one that handles networking, another that handles mounts, etc.
+Any number of profiles can be applied to a container. So you could have one that handles networking, another that handles mounts, etc.
 
 
 ## Networking
-Under settings you can do port forwarding.
+Under Settings > Advanced > Linux Development Environment, you can forward ports to the LXC containers.
+
+Todo: SSH access
 
 ## Files Access
+By default a folder called `Linux Files` is created in Chrome OS, and this is mapped to the user's home directory in the LXC containers.
+
+Additionally, you can select folders in the Chrome OS `Files` app, via right-click, to be shared into LXC containers.
 
 ## USB
+Under Settings > Advanced > Linux Development Environment you can choose to pass USB devices through to the LXC containers.
 
 ## Chrome OS internals
 For advanced troubleshooting, low-level development, or curiosity; one might wish to understand how Chrome OS works behind the scense. Especially considering that there appears to be some "magic" configuration of LXC containers.
@@ -219,11 +228,14 @@ This is a selection of useful links, it is not meant to be exhaustive.
 
 ### Chrome OS Fundamentals
 https://www.chromium.org/chromium-os/  
+https://www.chromium.org/chromium-os/chromiumos-design-docs/  
+https://chromium.googlesource.com/chromiumos/docs/+/refs/heads/main  
 https://chromium.googlesource.com/chromiumos/docs/+/HEAD/costini_developer_guide.md  
 https://chromium.googlesource.com/chromiumos/docs/+/HEAD/containers_and_vms.md  
 https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/docs/logging.md  
 https://chromium.googlesource.com/chromiumos/docs/+/HEAD/security/chromeos_security_whitepaper.md  
 https://chromium.googlesource.com/chromium/src/+/main/chrome/browser/ash/crostini  
+https://chromium.googlesource.com/chromiumos/docs/+/refs/heads/main/reporting_bugs.md#logs  
 https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/vm_tools/vsh/  
 https://www.chromium.org/chromium-os/chromiumos-design-docs/boot-design/  
 
@@ -244,7 +256,12 @@ https://wiki.archlinux.org/title/Chrome_OS_devices/Crostini
 https://medium.com/@tcij1013/lxc-lxd-cheetsheet-effb5389922d  
 https://wiki.debian.org/LXC  
 https://stgraber.org/2016/03/11/lxd-2-0-blog-post-series-012/  
-https://linuxcontainers.org/lxd/docs/master/authentication/  
+https://linuxcontainers.org/lxd/docs/master/authentication/
+https://www.turnkeylinux.org/lxc  
+https://wiki.alpinelinux.org/wiki/LXC
+https://wiki.archlinux.org/title/LXD#Create_a_container
+https://wiki.debian.org/LXC
+https://www.buzzwrd.me/index.php/2021/03/10/creating-lxc-containers-from-docker-and-oci-images/
 
 ### Yubikey
 https://blog.merzlabs.com/posts/crostini-now-usable/  
